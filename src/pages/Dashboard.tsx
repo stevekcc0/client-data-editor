@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<SheetData | null>(null);
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -98,21 +99,72 @@ const Dashboard = () => {
     setEditForm(null);
   };
 
-  const handleSave = () => {
-    if (editingIndex === null || !editForm) return;
+  const handleSave = async () => {
+    if (editingIndex === null || !editForm || !user) return;
     
-    // Update local state (read-only from Google Sheet, edits are local only)
-    const newData = [...data];
-    newData[editingIndex] = editForm;
-    setData(newData);
-    
-    setEditingIndex(null);
-    setEditForm(null);
-    
-    toast({
-      title: '注意',
-      description: '修改已在本地保存。如需永久保存，請直接編輯 Google Sheet。',
-    });
+    setSaving(true);
+    try {
+      // Check if record exists in database
+      const { data: existingData } = await supabase
+        .from('user_data')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('email', editForm.email)
+        .maybeSingle();
+
+      if (existingData) {
+        // Update existing record
+        const { error } = await supabase
+          .from('user_data')
+          .update({
+            ig_account: editForm.ig_account,
+            subject: editForm.subject,
+            keyword: editForm.keyword,
+            title: editForm.title,
+            ig_link: editForm.ig_link,
+          })
+          .eq('id', existingData.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('user_data')
+          .insert({
+            user_id: user.id,
+            email: editForm.email,
+            ig_account: editForm.ig_account,
+            subject: editForm.subject,
+            keyword: editForm.keyword,
+            title: editForm.title,
+            ig_link: editForm.ig_link,
+          });
+
+        if (error) throw error;
+      }
+
+      // Update local state
+      const newData = [...data];
+      newData[editingIndex] = editForm;
+      setData(newData);
+      
+      setEditingIndex(null);
+      setEditForm(null);
+      
+      toast({
+        title: '成功',
+        description: '資料已保存到雲端資料庫',
+      });
+    } catch (error: any) {
+      console.error('Error saving data:', error);
+      toast({
+        title: '錯誤',
+        description: '保存失敗，請稍後再試',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!user) return null;
@@ -229,10 +281,10 @@ const Dashboard = () => {
                         <TableCell className="text-right">
                           {editingIndex === index ? (
                             <div className="flex justify-end gap-1">
-                              <Button size="sm" variant="ghost" onClick={handleSave}>
-                                <Save className="h-4 w-4" />
+                              <Button size="sm" variant="ghost" onClick={handleSave} disabled={saving}>
+                                <Save className={`h-4 w-4 ${saving ? 'animate-spin' : ''}`} />
                               </Button>
-                              <Button size="sm" variant="ghost" onClick={handleCancel}>
+                              <Button size="sm" variant="ghost" onClick={handleCancel} disabled={saving}>
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
