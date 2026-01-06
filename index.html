@@ -3,19 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Lovable App" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <title>Client Data Editor | 雲端資料編輯</title>
+    <meta
+      name="description"
+      content="Client Data Editor：安全登入、即時編輯、雲端保存與管理你的客戶資料。"
+    />
+
+    <link rel="canonical" href="" id="canonical" />
+    <script>
+      // Canonical URL (simple SPA-safe default)
+      (function () {
+        var el = document.getElementById('canonical');
+        if (el) el.setAttribute('href', window.location.href.split('#')[0].split('?')[0]);
+      })();
+
+      // GitHub Pages fallback: if the repo is served from source (no build), redirect to /docs static page
+      (function () {
+        var host = window.location.hostname;
+        if (!host || !host.endsWith('github.io')) return;
+        var path = window.location.pathname || '/';
+        if (path.indexOf('/docs/') !== -1) return;
+        var base = path.replace(/\/$/, '');
+        window.location.replace(base + '/docs/');
+      })();
+    </script>
+
+    <meta property="og:title" content="Client Data Editor" />
+    <meta
+      property="og:description"
+      content="安全登入、即時編輯、雲端保存與管理你的客戶資料。"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
   </head>
 
