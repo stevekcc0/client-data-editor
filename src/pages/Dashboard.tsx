@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ interface SheetData {
   ig_link: string;
 }
 
-const Dashboard = () => {
+const Dashboard = forwardRef<HTMLDivElement>((_, ref) => {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<SheetData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -170,7 +170,7 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+    <div ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -305,6 +305,8 @@ const Dashboard = () => {
       </main>
     </div>
   );
-};
+});
+
+Dashboard.displayName = 'Dashboard';
 
 export default Dashboard;
